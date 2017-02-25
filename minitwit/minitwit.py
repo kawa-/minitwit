@@ -123,6 +123,10 @@ def public_timeline():
         where message.author_id = user.user_id
         order by message.pub_date desc limit ?''', [PER_PAGE]))
 
+@app.route('/account')
+def account():
+    """Displays and sets the user account."""
+    """TODO"""
 
 @app.route('/<username>')
 def user_timeline(username):
