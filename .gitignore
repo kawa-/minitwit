@@ -1,0 +1,5 @@
+minitwit.db
+.eggs/
+minitwit/__init__.pyc
+minitwit/minitwit.pyc
+tests/__pycache__/
