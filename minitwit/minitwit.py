@@ -30,6 +30,14 @@ app.config.from_object(__name__)
 app.config.from_envvar('MINITWIT_SETTINGS', silent=True)
 
 
+def gen_rand_str(length, chars=None):
+    import random
+    import string
+    if chars is None:
+        chars = string.digits + string.letters
+    return ''.join([random.choice(chars) for i in range(length)])
+
+
 def get_db():
     """Opens a new database connection if there is none yet for the
     current application context.
@@ -186,6 +194,8 @@ def add_message():
     """Registers a new message for the user."""
     if 'user_id' not in session:
         abort(401)
+    if request.form['token'] != g.user['token']:
+        abort(403)
     if request.form['text']:
         db = get_db()
         db.execute('''insert into message (author_id, text, pub_date)
@@ -238,9 +248,9 @@ def register():
         else:
             db = get_db()
             db.execute('''insert into user (
-              username, email, pw_hash) values (?, ?, ?)''',
+              username, email, pw_hash, token) values (?, ?, ?, ?)''',
               [request.form['username'], request.form['email'],
-               generate_password_hash(request.form['password'], 'pbkdf2:sha256')])
+               generate_password_hash(request.form['password'], 'pbkdf2:sha256'), gen_rand_str(32)])
             db.commit()
             flash('You were successfully registered and can login now')
             return redirect(url_for('login'))
